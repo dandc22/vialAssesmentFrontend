@@ -3,19 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-
-interface SourceDataItem {
-  id: string
-  question: string
-  answer: string
-  sourceRecordId: string
-}
-
-interface FormSubmission {
-  id: string
-  formId: string
-  sourceData: SourceDataItem[]
-}
+import { FormSubmission } from '@/types/submission'
+import SubmissionList from './components/SubmissionList'
 
 export default function FormDataPage() {
   const { id } = useParams()
@@ -79,33 +68,7 @@ export default function FormDataPage() {
 
       <div className="bg-white shadow rounded-lg p-6">
         <h1 className="text-xl font-semibold text-gray-900 mb-4">Form Submissions</h1>
-
-        <div className="space-y-8">
-          {submissions.map((submission: FormSubmission) => (
-            <div key={submission.id} className="border rounded-lg p-4">
-              <div className="border-b pb-2 mb-4">
-                <p className="text-sm text-gray-500">Submission ID</p>
-                <p className="text-gray-900">{submission.id}</p>
-              </div>
-
-              <div>
-                <p className="text-sm text-gray-500 mb-2">Responses</p>
-                <div className="space-y-2">
-                  {submission.sourceData.map((item: SourceDataItem) => (
-                    <div key={item.id} className="bg-gray-50 p-3 rounded-md">
-                      <p className="text-sm font-medium text-gray-700">{item.question}</p>
-                      <p className="text-gray-900">
-                        {item.answer.includes('T00:00:00.000Z') 
-                          ? new Date(item.answer).toLocaleDateString()
-                          : item.answer}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <SubmissionList submissions={submissions} />
       </div>
     </div>
   )
