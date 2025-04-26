@@ -13,11 +13,12 @@ interface FormField {
   type: FormInputType
   label: string
   order: number
+  required: boolean
 }
 
 interface SortableFieldProps {
   field: FormField
-  onUpdate: (id: string, newLabel: string) => void
+  onUpdate: (id: string, newLabel: string, required?: boolean) => void
   onDelete: (id: string) => void
   isActive: boolean
 }
@@ -68,13 +69,26 @@ function SortableField({ field, onUpdate, onDelete, isActive }: SortableFieldPro
           ×
         </button>
       </div>
-      <div className="mt-1">
-        <input
-          type={field.type === FormInputType.DATETIME ? 'datetime-local' : field.type.toLowerCase()}
-          placeholder={`Enter ${field.type.toLowerCase()}`}
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-          disabled
-        />
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <input
+            type={field.type === FormInputType.DATETIME ? 'datetime-local' : field.type.toLowerCase()}
+            placeholder={`Enter ${field.type.toLowerCase()}`}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            disabled
+          />
+          <div className="flex items-center ml-4">
+            <label className="inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={field.required}
+                onChange={(e) => onUpdate(field.id, field.label, e.target.checked)}
+                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              />
+              <span className="ml-2 text-sm text-gray-600">Required</span>
+            </label>
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -132,7 +146,7 @@ export default function FormBuilder() {
       acc[field.id] = {
         type: field.type.toLowerCase(),
         question: field.label,
-        required: true // You might want to make this configurable
+        required: field.required
       }
       return acc
     }, {} as Record<string, { type: string; question: string; required: boolean }>)
@@ -203,15 +217,22 @@ export default function FormBuilder() {
         type: type,
         label: `New ${type} field`,
         order: formFields.length,
+        required: true,
       }
       setFormFields([...formFields, newField])
     }
   }
 
-  const handleFieldUpdate = (id: string, newLabel: string) => {
+  const handleFieldUpdate = (id: string, newLabel: string, required?: boolean) => {
     setFormFields(fields =>
       fields.map(field =>
-        field.id === id ? { ...field, label: newLabel } : field
+        field.id === id
+          ? {
+              ...field,
+              label: newLabel,
+              required: required !== undefined ? required : field.required
+            }
+          : field
       )
     )
   }
