@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
+import Link from 'next/link'
 import { FormConfig, FormInputType, ApiFormResponse } from '@/types/form'
 import FormInput from './components/FormInput'
 
@@ -54,6 +55,14 @@ export default function ViewForm() {
 
   return (
     <>
+      <div className="mb-4 flex items-center">
+        <Link
+          href="/forms"
+          className="inline-flex items-center px-3 py-1 text-sm text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-md"
+        >
+          ← Back to Forms
+        </Link>
+      </div>
       <div className="mb-8">
         <h1 className="text-xl font-semibold text-gray-900 border-b-2 border-gray-200 pb-2">
           Preview Form: {formConfig.name}

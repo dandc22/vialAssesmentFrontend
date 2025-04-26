@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { DndContext, DragEndEvent, DragStartEvent, useSensor, useSensors, PointerSensor } from '@dnd-kit/core'
 import { useDroppable } from '@dnd-kit/core'
 import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable'
@@ -221,6 +222,14 @@ export default function FormBuilder() {
 
   return (
     <>
+      <div className="mb-4 flex items-center">
+        <Link
+          href="/forms"
+          className="inline-flex items-center px-3 py-1 text-sm text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-md"
+        >
+          ← Back to Forms
+        </Link>
+      </div>
       {error && (
         <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md text-red-600">
           {error}

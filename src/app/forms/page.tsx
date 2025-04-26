@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { FormList } from './components/FormList'
 
 export default function FormsPage() {
   return (
@@ -16,9 +17,8 @@ export default function FormsPage() {
           </Link>
         </div>
         
-        {/* Form list will be implemented later */}
         <div className="bg-white shadow-lg rounded-lg p-6">
-          <p className="text-gray-600">No forms created yet.</p>
+          <FormList />
         </div>
       </div>
     </div>
