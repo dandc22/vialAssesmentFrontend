@@ -29,7 +29,7 @@ function DraggableItem({ id, type }: DraggableItemProps) {
       style={style}
     >
       <div className="flex items-center gap-2">
-        <span className="text-gray-600">{type}</span>
+        <span className="text-gray-700 font-medium">{type}</span>
       </div>
     </div>
   )
@@ -44,7 +44,7 @@ export default function InputTypeMenu() {
 
   return (
     <div className="w-64 bg-white rounded-lg shadow-lg p-4">
-      <h2 className="text-lg font-semibold mb-4">Input Types</h2>
+      <h2 className="text-xl font-bold text-gray-800 mb-4">Input Types</h2>
       <div>
         {inputTypes.map((input) => (
           <DraggableItem key={input.id} id={input.id} type={input.type} />
