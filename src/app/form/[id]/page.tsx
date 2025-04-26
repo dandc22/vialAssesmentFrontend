@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
-import Link from 'next/link'
 import { FormConfig, FormInputType, ApiFormResponse } from '@/types/form'
-import FormInput from './components/FormInput'
+import FormView from './components/FormView'
 
 export default function ViewForm() {
   const { id } = useParams()
@@ -53,48 +52,5 @@ export default function ViewForm() {
     return <div className="p-4 text-red-500">{error || 'Form not found'}</div>
   }
 
-  return (
-    <>
-      <div className="mb-4 flex items-center">
-        <Link
-          href="/forms"
-          className="inline-flex items-center px-3 py-1 text-sm text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-md"
-        >
-          ← Back to Forms
-        </Link>
-      </div>
-      <div className="mb-8">
-        <h1 className="text-xl font-semibold text-gray-900 border-b-2 border-gray-200 pb-2">
-          Preview Form: {formConfig.name}
-        </h1>
-      </div>
-      <form className="space-y-4">
-        {formConfig.fields.map((field) => (
-          <div
-            key={field.id}
-            className="p-4 border border-gray-200 rounded-md"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <label
-                htmlFor={field.id}
-                className="text-sm font-medium text-gray-700"
-              >
-                {field.label}
-                {field.required && <span className="text-red-500 ml-1">*</span>}
-              </label>
-            </div>
-            <div className="mt-1">
-              <FormInput
-                type={field.type}
-                id={field.id}
-                name={field.id}
-                required={field.required}
-                placeholder={`Enter ${field.type.toLowerCase()}`}
-              />
-            </div>
-          </div>
-        ))}
-      </form>
-    </>
-  )
+  return <FormView formConfig={formConfig} />
 }

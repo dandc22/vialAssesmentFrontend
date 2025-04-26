@@ -8,9 +8,11 @@ interface FormInputProps {
   name: string
   required: boolean
   placeholder?: string
+  value?: string
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 
-export default function FormInput({ type, id, name, required, placeholder }: FormInputProps) {
+export default function FormInput({ type, id, name, required, placeholder, value, onChange }: FormInputProps) {
   const baseInputClasses = "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 text-base"
 
   if (type === FormInputType.DATETIME) {
@@ -23,6 +25,8 @@ export default function FormInput({ type, id, name, required, placeholder }: For
             name={`${id}-datetime-local`}
             required={required}
             className={baseInputClasses}
+            value={value}
+            onChange={onChange}
           />
         </div>
       </div>
@@ -37,6 +41,8 @@ export default function FormInput({ type, id, name, required, placeholder }: For
       required={required}
       placeholder={placeholder}
       className={baseInputClasses}
+      value={value}
+      onChange={onChange}
     />
   )
 }
