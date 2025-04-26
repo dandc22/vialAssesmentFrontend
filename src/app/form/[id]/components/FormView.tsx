@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { FormConfig, FormInputType } from '@/types/form'
+import { FormConfig } from '@/types/form'
 import FormInput from './FormInput'
 
 interface FormViewProps {
@@ -30,8 +30,6 @@ export default function FormView({ formConfig }: FormViewProps) {
     const missingFields = formConfig.fields
       .filter(field => field.required && !formData[field.id])
       .map(field => field.label)
-
-    console.log('formData ---------> ', JSON.stringify(formData))
 
     if (missingFields.length > 0) {
       setError(`Please fill in required fields: ${missingFields.join(', ')}`)
@@ -79,12 +77,18 @@ export default function FormView({ formConfig }: FormViewProps) {
 
   return (
     <>
-      <div className="mb-4 flex items-center">
+      <div className="mb-4 flex items-center gap-2">
         <Link
           href="/forms"
           className="inline-flex items-center px-3 py-1 text-sm text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-md"
         >
           ← Back to Forms
+        </Link>
+        <Link
+          href={`/form/${formConfig.id}/data`}
+          className="inline-flex items-center px-3 py-1 text-sm text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-md"
+        >
+          View Form Data
         </Link>
       </div>
       <div className="mb-8">
