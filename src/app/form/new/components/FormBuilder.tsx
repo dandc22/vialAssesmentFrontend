@@ -5,10 +5,11 @@ import { DndContext, DragEndEvent, DragStartEvent, useSensor, useSensors, Pointe
 import { useDroppable } from '@dnd-kit/core'
 import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable'
 import InputTypeMenu from './InputTypeMenu'
+import { FormInputType } from '@/types/form'
 
 interface FormField {
   id: string
-  type: 'text' | 'password' | 'number'
+  type: FormInputType
   label: string
   order: number
 }
@@ -68,8 +69,8 @@ function SortableField({ field, onUpdate, onDelete, isActive }: SortableFieldPro
       </div>
       <div className="mt-1">
         <input
-          type={field.type}
-          placeholder={`Enter ${field.type}`}
+          type={field.type === FormInputType.DATETIME ? 'datetime-local' : field.type.toLowerCase()}
+          placeholder={`Enter ${field.type.toLowerCase()}`}
           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
           disabled
         />
@@ -78,13 +79,28 @@ function SortableField({ field, onUpdate, onDelete, isActive }: SortableFieldPro
   )
 }
 
-function DroppableArea({ children }: { children: React.ReactNode }) {
-  const { setNodeRef } = useDroppable({
+function DroppableArea({
+  children,
+  activeId
+}: {
+  children: React.ReactNode
+  activeId: string | null
+}) {
+  const { setNodeRef, isOver } = useDroppable({
     id: 'form-area',
   })
 
   return (
-    <div ref={setNodeRef} className="flex-1 bg-white rounded-lg shadow-lg min-h-[600px] p-6">
+    <div
+      ref={setNodeRef}
+      className={`flex-1 h-auto min-h-[400px] flex flex-col rounded-lg border-2 border-dashed transition-colors ${
+        isOver && activeId?.toString().startsWith('new-')
+          ? 'border-indigo-500 bg-indigo-100/70 shadow-lg'
+          : activeId?.toString().startsWith('new-')
+            ? 'border-indigo-400 bg-indigo-50/50'
+            : 'border-gray-200 hover:border-gray-300'
+      }`}
+    >
       {children}
     </div>
   )
@@ -113,7 +129,7 @@ export default function FormBuilder() {
     // Transform formFields array into expected fields record
     const fields = formFields.reduce((acc, field) => {
       acc[field.id] = {
-        type: field.type,
+        type: field.type.toLowerCase(),
         question: field.label,
         required: true // You might want to make this configurable
       }
@@ -134,7 +150,6 @@ export default function FormBuilder() {
 
       if (!response.ok) {
         const data = await response.json()
-        console.log('data ---------> ', JSON.stringify(data))
         throw new Error(data.error || 'Failed to create form')
       }
 
@@ -180,10 +195,11 @@ export default function FormBuilder() {
 
     // Handle adding new field
     if (over.id === 'form-area') {
-      const type = active.id.toString().replace('new-', '') as 'text' | 'password' | 'number'
+      const typeStr = active.id.toString().replace('new-', '').toLowerCase()
+      const type = FormInputType[typeStr.toUpperCase() as keyof typeof FormInputType]
       const newField: FormField = {
         id: `field-${Date.now()}`,
-        type,
+        type: type,
         label: `New ${type} field`,
         order: formFields.length,
       }
@@ -204,66 +220,68 @@ export default function FormBuilder() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {error && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md text-red-600">
-            {error}
-          </div>
-        )}
-        <div className="mb-8">
-          <input
-            type="text"
-            value={formName}
-            onChange={(e) => setFormName(e.target.value)}
-            placeholder="Enter form name"
-            className="w-full px-4 py-2 text-xl font-semibold text-gray-900 border-b-2 border-gray-200 focus:border-indigo-500 focus:outline-none bg-white placeholder-gray-400"
-          />
+    <>
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md text-red-600">
+          {error}
         </div>
-
-        <div className="flex gap-8">
-          <DndContext
-            sensors={sensors}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-          >
-            <DroppableArea>
-              {formFields.length === 0 ? (
-                <div className="h-full flex items-center justify-center text-gray-600 text-lg">
-                  Drag and drop form elements here
-                </div>
-              ) : (
-                <SortableContext items={formFields} strategy={verticalListSortingStrategy}>
-                  <div className="space-y-4">
-                    {formFields.map((field) => (
-                      <SortableField
-                        key={field.id}
-                        field={field}
-                        onUpdate={handleFieldUpdate}
-                        onDelete={handleFieldDelete}
-                        isActive={activeId === field.id}
-                      />
-                    ))}
-                  </div>
-                </SortableContext>
-              )}
-            </DroppableArea>
-            <InputTypeMenu />
-          </DndContext>
-        </div>
-        <div className="mt-8 flex justify-end">
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            className={`px-4 py-2 rounded-md text-white font-medium ${isSubmitting
-                ? 'bg-indigo-400 cursor-not-allowed'
-                : 'bg-indigo-600 hover:bg-indigo-700'
-              }`}
-          >
-            {isSubmitting ? 'Creating...' : 'Create Form'}
-          </button>
-        </div>
+      )}
+      <div className="mb-8">
+        <input
+          type="text"
+          value={formName}
+          onChange={(e) => setFormName(e.target.value)}
+          placeholder="Enter form name"
+          className="w-full px-4 py-2 text-xl font-semibold text-gray-900 border-b-2 border-gray-200 focus:border-indigo-500 focus:outline-none bg-white placeholder-gray-400"
+        />
       </div>
-    </div>
+
+      <div className="flex gap-8">
+        <DndContext
+          sensors={sensors}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
+          <DroppableArea activeId={activeId}>
+            {formFields.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-gray-600">
+                <svg className="w-12 h-12 mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 13l-7 7-7-7m14-8l-7 7-7-7" />
+                </svg>
+                <p className="text-lg">Drag and drop form elements here</p>
+                <p className="text-sm text-gray-500 mt-2">Click and drag items from the menu on the right</p>
+              </div>
+            ) : (
+              <SortableContext items={formFields} strategy={verticalListSortingStrategy}>
+                <div className="space-y-4 p-4 pb-8 min-h-0 overflow-y-auto">
+                  {formFields.map((field) => (
+                    <SortableField
+                      key={field.id}
+                      field={field}
+                      onUpdate={handleFieldUpdate}
+                      onDelete={handleFieldDelete}
+                      isActive={activeId === field.id}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            )}
+          </DroppableArea>
+          <InputTypeMenu />
+        </DndContext>
+      </div>
+      <div className="mt-8 flex justify-end">
+        <button
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+          className={`px-4 py-2 rounded-md text-white font-medium ${isSubmitting
+            ? 'bg-indigo-400 cursor-not-allowed'
+            : 'bg-indigo-600 hover:bg-indigo-700'
+            }`}
+        >
+          {isSubmitting ? 'Creating...' : 'Create Form'}
+        </button>
+      </div>
+    </>
   )
 }

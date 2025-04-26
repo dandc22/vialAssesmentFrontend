@@ -1,10 +1,11 @@
 'use client'
 
 import { useDraggable } from '@dnd-kit/core'
+import { FormInputType } from '@/types/form'
 
 interface DraggableItemProps {
   id: string
-  type: string
+  type: FormInputType
 }
 
 function DraggableItem({ id, type }: DraggableItemProps) {
@@ -37,13 +38,14 @@ function DraggableItem({ id, type }: DraggableItemProps) {
 
 export default function InputTypeMenu() {
   const inputTypes = [
-    { id: 'new-text', type: 'Text' },
-    { id: 'new-password', type: 'Password' },
-    { id: 'new-number', type: 'Number' },
+    { id: 'new-text', type: FormInputType.TEXT },
+    { id: 'new-password', type: FormInputType.PASSWORD },
+    { id: 'new-number', type: FormInputType.NUMBER },
+    { id: 'new-datetime', type: FormInputType.DATETIME },
   ]
 
   return (
-    <div className="w-64 bg-white rounded-lg shadow-lg p-4">
+    <div className="w-64 bg-white rounded-lg shadow-lg p-4 sticky top-4 self-start">
       <h2 className="text-xl font-bold text-gray-800 mb-4">Input Types</h2>
       <div>
         {inputTypes.map((input) => (
